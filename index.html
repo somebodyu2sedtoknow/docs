@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SWIL</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+  font-family: Arial, sans-serif;
+  background: url('https://i.pinimg.com/736x/68/aa/c8/68aac8479ce6bd16304fda727f9c2486.jpg') no-repeat center center fixed;
+  background-size: cover;
+  color: black;
+  cursor: url('https://25.media.tumblr.com/9b61ee90f1461f2459513f123e961ddf/tumblr_mvrnn6xt151sjkr6no1_500.gif'), auto;
+  overflow-x: hidden;
+  position: relative;
+}
+
+/* Overlays */
+#body-overlay {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: url('https://64.media.tumblr.com/8871518c1f104c9cede189ba8a041913/tumblr_n02trm8qkq1svwlszo1_r1_500.gif') no-repeat center center;
+  background-size: cover;
+  pointer-events: none;
+  z-index: 0;
+}
+
+#top-banner {
+  position: fixed;
+  top: 0; left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  max-width: 600px;
+  z-index: 1;
+}
+
+h1, h2 { position: relative; z-index: 2; }
+h1 { text-align: center; font-size: 5em; color: black; -webkit-text-stroke: 2px red; margin-top: 150px; }
+h2 { text-align: center; font-size: 1.2em; margin-bottom: 50px; color: black; -webkit-text-stroke: 1px red; }
+
+/* Existing repeating small side GIFs */
+#side-left, #side-right {
+  position: fixed; top:0; width: 80px; height: 100%;
+  background: url('https://media4.giphy.com/media/10a8AOSeP6Rqfu/200w.gif?cid=790b7611r9wo0kx37gdmv13xww5xkm93hlxjf1ez816nybk6&ep=v1_gifs_search&rid=200w.gif&ct=s') repeat-y;
+  background-size: 80px auto; z-index: 2;
+}
+#side-left { left:0; } #side-right { right:0; }
+
+/* New smaller side GIFs */
+#big-left, #big-right {
+  position: fixed; top: 0; width: 100px; height: 100%;
+  background: url('https://64.media.tumblr.com/a33b974be0ceb710cad1e2d90852ea7f/6fefe7acdbd459ca-79/s250x400/67d4aca6996622af3a2998bb085fe2982567a931.gif') no-repeat center center;
+  background-size: contain; z-index: 1;
+}
+#big-left { left: 90px; } /* offset to avoid small GIF */
+#big-right { right: 90px; }
+
+#corner-dog { position: fixed; bottom: 20px; left: 20px; width: 80px; z-index: 10; }
+#bottom-gif { position: fixed; bottom: 0; right: 50%; transform: translateX(50%); width: 150px; z-index: 5; }
+#flying-gif { position: absolute; pointer-events: none; z-index: 9999; }
+
+#login-section, #post-section {
+  width: 80%; max-width: 800px; margin: auto;
+  background: rgba(255,255,255,0.8); padding: 20px; border-radius: 10px;
+  margin-bottom: 30px; position: relative; z-index: 2;
+}
+
+#posts { margin: 20px auto; width: 80%; max-width: 800px; position: relative; z-index:2; }
+.post, .comment { background: rgba(255,255,255,0.9); margin: 10px 0; padding: 10px; border-radius: 8px; }
+input, textarea, select { width: 100%; margin: 5px 0; padding: 5px; }
+button { padding: 5px 10px; margin-top: 5px; cursor: pointer; }
+
+/* Music player */
+#music-player {
+  position: fixed;
+  bottom: 20px; right: 20px;
+  background: rgba(255,255,255,0.9);
+  padding: 10px;
+  border-radius: 8px;
+  z-index: 20;
+  width: 250px;
+}
+#music-player input { width: 100%; }
+</style>
+</head>
+<body>
+
+<div id="body-overlay"></div>
+<img id="top-banner" src="https://media.tenor.com/lu7ZRQm96x0AAAAi/heart-banner-kawaii.gif">
+
+<div id="side-left"></div>
+<div id="side-right"></div>
+<div id="big-left"></div>
+<div id="big-right"></div>
+
+<img id="corner-dog" src="https://i.gzn.jp/img/2022/02/22/fastest-gif-animation/dancing-dog-2.gif">
+<img id="bottom-gif" src="https://platform.vox.com/wp-content/uploads/sites/2/chorus/uploads/chorus_asset/file/8688491/hiE5vMs.gif?quality=90&strip=all&crop=0,0,100,100">
+
+<h1>SWIL</h1>
+<h2>Sharing - What - I - Like</h2>
+
+<div id="login-section">
+  <label>Select Role:</label>
+  <select id="role-select">
+    <option value="guest">Guest</option>
+    <option value="admin">Admin</option>
+  </select>
+  <div id="password-div" style="display:none;">
+    <input type="password" id="admin-password" placeholder="Enter admin password">
+  </div>
+  <button onclick="login()">Login</button>
+</div>
+
+<div id="post-section" style="display:none;">
+  <h3>Create a Post</h3>
+  <textarea id="post-text" placeholder="Text"></textarea>
+  <input type="file" id="post-file" accept="image/*,video/*,gif" multiple>
+  <button onclick="createPost()">Post</button>
+</div>
+
+<div id="posts"></div>
+
+<!-- Music Player -->
+<div id="music-player">
+  <input type="text" id="music-url" placeholder="YouTube URL">
+  <button onclick="playMusic()">Play</button>
+  <div id="music-container"></div>
+</div>
+
+<audio id="fart-sound" src="https://www.soundjay.com/human/fart-01.mp3"></audio>
+<audio id="dog-bark" src="https://www.soundjay.com/dog/dog-bark-1.mp3"></audio>
+
+<script>
+let role = "guest";
+
+// Login
+function login() {
+  const selectedRole = document.getElementById('role-select').value;
+  if(selectedRole === 'admin') {
+    document.getElementById('password-div').style.display = 'block';
+    const password = document.getElementById('admin-password').value;
+    if(password === 'didifuckingstutter') {
+      role = 'admin';
+      alert('Logged in as admin!');
+      document.getElementById('post-section').style.display = 'block';
+    } else {
+      role = 'guest';
+      alert('Wrong password! Logged in as guest.');
+    }
+  } else {
+    role = 'guest';
+    alert('Logged in as guest.');
+  }
+}
+
+// Create post
+function createPost() {
+  if(role !== 'admin') return;
+  const text = document.getElementById('post-text').value;
+  const files = document.getElementById('post-file').files;
+
+  const postDiv = document.createElement('div');
+  postDiv.className = 'post';
+  postDiv.innerHTML = `<p>${text}</p>`;
+
+  for(let i=0;i<files.length;i++){
+    const file = files[i];
+    const reader = new FileReader();
+    reader.onload = function(e){
+      if(file.type.startsWith("image/") || file.type === "image/gif"){
+        const img = document.createElement('img');
+        img.src = e.target.result;
+        img.style.maxWidth="100%";
+        postDiv.appendChild(img);
+      } else if(file.type.startsWith("video/")){
+        const vid = document.createElement('video');
+        vid.src = e.target.result;
+        vid.controls = true;
+        vid.style.maxWidth="100%";
+        postDiv.appendChild(vid);
+      }
+    };
+    reader.readAsDataURL(file);
+  }
+
+  const commentDiv = document.createElement('div');
+  commentDiv.innerHTML = `<textarea placeholder="Add comment"></textarea>
+    <button onclick="addComment(this)">Comment</button>`;
+  postDiv.appendChild(commentDiv);
+
+  document.getElementById('posts').prepend(postDiv);
+  document.getElementById('post-text').value = '';
+  document.getElementById('post-file').value = '';
+}
+
+// Add comment
+function addComment(btn) {
+  if(role === 'guest' || role === 'admin') {
+    const commentText = btn.previousElementSibling.value;
+    if(commentText.trim() === '') return;
+    const commentDiv = document.createElement('div');
+    commentDiv.className = 'comment';
+    commentDiv.innerText = commentText;
+    btn.parentElement.parentElement.appendChild(commentDiv);
+    btn.previousElementSibling.value = '';
+  }
+}
+
+// Flying GIFs bigger
+function createFlyingGif() {
+  const gif = document.createElement('img');
+  gif.src = 'https://64.media.tumblr.com/01a1afe754400f6254b6650e20b33ef4/tumblr_pgh03shQpu1wchb2mo10_r1_250.gif';
+  gif.style.position = 'absolute';
+  gif.style.width = '100px'; // bigger
+  gif.style.left = Math.random() * (window.innerWidth - 100) + 'px';
+  gif.style.top = Math.random() * (window.innerHeight - 100) + 'px';
+  document.body.appendChild(gif);
+  setTimeout(() => gif.remove(), 5000);
+}
+setInterval(createFlyingGif, 2000);
+
+// Fart sound on click
+document.addEventListener('click', () => {
+  document.getElementById('fart-sound').play();
+});
+
+// Dog bark every 30 minutes
+setInterval(() => {
+  document.getElementById('dog-bark').play();
+}, 1800000);
+
+// Music player
+function playMusic() {
+  const url = document.getElementById('music-url').value;
+  const container = document.getElementById('music-container');
+  container.innerHTML = `<iframe width="230" height="80" src="https://www.youtube.com/embed/${getYouTubeID(url)}?autoplay=1" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>`;
+}
+
+// Extract YouTube ID
+function getYouTubeID(url) {
+  const reg = /(?:youtube\.com\/.*v=|youtu\.be\/)([^&]+)/;
+  const match = url.match(reg);
+  return match ? match[1] : '';
+}
+</script>
+
+</body>
+</html>
